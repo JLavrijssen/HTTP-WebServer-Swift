@@ -11,7 +11,7 @@ import Foundation
 #if os(Linux)
 import Glibc
 #else
-import Darwin.C
+import Darwin
 #endif
 
 //print("Hello, World!")
@@ -19,8 +19,8 @@ import Darwin.C
 let zero = Int8(0)
 let transportLayerType = SOCK_STREAM // TCP
 let internetLayerProtocol = AF_INET // IPv4
-let sock = socket(internetLayerProtocol, Int32(transportLayerType), 0) // Socket
-let portNumber = UInt16(6969) // Created Port
+let sock = socket(internetLayerProtocol, Int32(transportLayerType), 0)
+let portNumber = UInt16(4000) // Created Port
 let socklen = UInt8(socklen_t(MemoryLayout<sockaddr_in>.size))
 var serveraddr = sockaddr_in()
 serveraddr.sin_family = sa_family_t(AF_INET)
@@ -32,7 +32,7 @@ withUnsafePointer(to: &serveraddr) { sockaddrInPtr in
   bind(sock, sockaddrPtr, socklen_t(socklen))
 }
 listen(sock, 5)
-print("Server listening on port \(portNumber) Server location Localhost:\(portNumber)") //Succesful startup message
+print("Server listening on port \(portNumber)")
 repeat {
   let client = accept(sock, nil, nil)
   let html = "<!DOCTYPE html><html><body style='text-align:center;'><h1>Hello from <a href='https://swift.org'>Swift</a> Web Server.</h1></body></html>"
@@ -40,7 +40,6 @@ repeat {
     HTTP/1.1 200 OK
     server: simple-swift-server
     content-length: \(html.count)
-    
     \(html)
     """
   httpResponse.withCString { bytes in
@@ -48,4 +47,3 @@ repeat {
     close(client)
  }
 } while sock > -1
-
